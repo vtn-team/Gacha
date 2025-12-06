@@ -8,7 +8,6 @@ using UnityEngine.UIElements;
 
 public class Manager : MonoBehaviour
 {
-    [SerializeField] NotionSetting _setting;
     [SerializeField] RectTransform _box;
     [SerializeField] GameObject _userPrefab;
     [SerializeField] Text _hitName;
@@ -51,6 +50,15 @@ public class Manager : MonoBehaviour
     List<Human> _stock = new List<Human>();
     Human _current = null;
 
+    class NameViewer
+    {
+        public Action Action;
+        public void SetFunc(Action act)
+        {
+            Action = act;
+        }
+    }
+
     private void Start()
     {
         LoadHuman();
@@ -59,8 +67,9 @@ public class Manager : MonoBehaviour
     //マスタデータ読み込み関数
     private void LoadHuman()
     {
-        Debug.Log("request");
-        Network.WebRequest.PostRequest(_setting.URI, new PostBody() { token = _setting.Token }, (string json) =>
+        NotionSetting _setting = SettingReferer.Instance.Setting;
+        Debug.Log("request:" + _setting.URI + _setting.DatabaseID);
+        Network.WebRequest.GetRequest(_setting.URI + _setting.DatabaseID + "/01", (string json) =>
         {
             Debug.Log("{ \"Data\": " + json + " }");
             var res = JsonUtility.FromJson<Response>("{ \"Data\" : " + json + " }");
